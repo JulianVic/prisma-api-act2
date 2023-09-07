@@ -1,0 +1,69 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model clientes {
+  id         Int       @id @default(autoincrement())
+  nombre     String?   @db.VarChar(50)
+  apellidos  String?   @db.VarChar(50)
+  created_At DateTime? @default(now()) @db.Timestamp(0)
+  email      String?   @db.VarChar(50)
+  ventas     ventas[]
+}
+
+model entradas {
+  id_entrada  Int        @id @default(autoincrement())
+  id_producto Int?
+  cantidad    Int?
+  productos   productos? @relation(fields: [id_producto], references: [id_producto], onDelete: NoAction, onUpdate: NoAction, map: "entradas_ibfk_1")
+
+  @@index([id_producto], map: "entradas_ibfk_1")
+}
+
+model marcas {
+  id        Int         @id @default(autoincrement())
+  nombre    String?     @db.VarChar(50)
+  productos productos[]
+}
+
+model productos {
+  id_producto       Int        @id @default(autoincrement())
+  nombre            String?    @db.VarChar(50)
+  precio            Decimal    @db.Decimal(8, 2)
+  cantidad_en_stock Int?
+  marca_id          Int?
+  entradas          entradas[]
+  marcas            marcas?    @relation(fields: [marca_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "productos_ibfk_1")
+  salidas           salidas[]
+  ventas            ventas[]
+
+  @@index([marca_id], map: "marca_id")
+}
+
+model salidas {
+  id_salida   Int        @id @default(autoincrement())
+  id_producto Int?
+  cantidad    Int?
+  productos   productos? @relation(fields: [id_producto], references: [id_producto], onDelete: NoAction, onUpdate: NoAction, map: "salidas_ibfk_1")
+
+  @@index([id_producto], map: "id_producto")
+}
+
+model ventas {
+  id          Int       @id @default(autoincrement())
+  id_cliente  Int
+  id_producto Int
+  cantidad    Int
+  total       Decimal   @db.Decimal(8, 2)
+  created_at  DateTime? @default(now()) @db.Timestamp(0)
+  clientes    clientes  @relation(fields: [id_cliente], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "ventas_ibfk_1")
+  productos   productos @relation(fields: [id_producto], references: [id_producto], onDelete: NoAction, onUpdate: NoAction, map: "ventas_ibfk_2")
+
+  @@index([id_cliente], map: "id_cliente")
+  @@index([id_producto], map: "ventas_ibfk_2")
+}
