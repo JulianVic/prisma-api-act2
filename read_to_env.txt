@@ -1,0 +1,5 @@
+Para conectar a la base de datos se necesita un archivo .env en la raiz
+del proyecto, con el siguiente nombre:
+
+DATABASE_URL="el_url_de_tu_base_de_datos"
+
